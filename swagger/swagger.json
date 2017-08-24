@@ -1,0 +1,475 @@
+{
+    "swagger": "2.0",
+    "info": {
+        "title": "beego Test API",
+        "description": "beego has a very cool tools to autogenerate documents for your API",
+        "version": "1.0.0",
+        "termsOfService": "http://beego.me/",
+        "contact": {
+            "email": "astaxie@gmail.com"
+        },
+        "license": {
+            "name": "Apache 2.0",
+            "url": "http://www.apache.org/licenses/LICENSE-2.0.html"
+        }
+    },
+    "basePath": "/v1",
+    "paths": {
+        "/ipfs/": {
+            "post": {
+                "tags": [
+                    "ipfs"
+                ],
+                "description": "upload json to IPFS",
+                "operationId": "IpfsController.upload",
+                "parameters": [
+                    {
+                        "in": "body",
+                        "name": "body",
+                        "description": "body for user content",
+                        "required": true,
+                        "schema": {
+                            "$ref": "#/definitions/models.Ipfs"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "{int} models.Ipfs.IpfsId"
+                    },
+                    "403": {
+                        "description": "body is empty"
+                    }
+                }
+            }
+        },
+        "/ipfs/{ipfsId}": {
+            "get": {
+                "tags": [
+                    "ipfs"
+                ],
+                "description": "download json from IPFS",
+                "operationId": "IpfsController.download",
+                "parameters": [
+                    {
+                        "in": "path",
+                        "name": "ipfsId",
+                        "description": "ipfsId for json",
+                        "required": true,
+                        "type": "string"
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "schema": {
+                            "$ref": "#/definitions/models.Ipfs"
+                        }
+                    },
+                    "403": {
+                        "description": "ipfsId is error"
+                    }
+                }
+            }
+        },
+        "/object/": {
+            "get": {
+                "tags": [
+                    "object"
+                ],
+                "description": "get all objects",
+                "operationId": "ObjectController.GetAll",
+                "responses": {
+                    "200": {
+                        "schema": {
+                            "$ref": "#/definitions/models.Object"
+                        }
+                    },
+                    "403": {
+                        "description": ":objectId is empty"
+                    }
+                }
+            },
+            "post": {
+                "tags": [
+                    "object"
+                ],
+                "description": "create object",
+                "operationId": "ObjectController.Create",
+                "parameters": [
+                    {
+                        "in": "body",
+                        "name": "body",
+                        "description": "The object content",
+                        "required": true,
+                        "schema": {
+                            "$ref": "#/definitions/models.Object"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "{string} models.Object.Id"
+                    },
+                    "403": {
+                        "description": "body is empty"
+                    }
+                }
+            }
+        },
+        "/object/{objectId}": {
+            "get": {
+                "tags": [
+                    "object"
+                ],
+                "description": "find object by objectid",
+                "operationId": "ObjectController.Get",
+                "parameters": [
+                    {
+                        "in": "path",
+                        "name": "objectId",
+                        "description": "the objectid you want to get",
+                        "required": true,
+                        "type": "string"
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "schema": {
+                            "$ref": "#/definitions/models.Object"
+                        }
+                    },
+                    "403": {
+                        "description": ":objectId is empty"
+                    }
+                }
+            },
+            "put": {
+                "tags": [
+                    "object"
+                ],
+                "description": "update the object",
+                "operationId": "ObjectController.Update",
+                "parameters": [
+                    {
+                        "in": "path",
+                        "name": "objectId",
+                        "description": "The objectid you want to update",
+                        "required": true,
+                        "type": "string"
+                    },
+                    {
+                        "in": "body",
+                        "name": "body",
+                        "description": "The body",
+                        "required": true,
+                        "schema": {
+                            "$ref": "#/definitions/models.Object"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "schema": {
+                            "$ref": "#/definitions/models.Object"
+                        }
+                    },
+                    "403": {
+                        "description": ":objectId is empty"
+                    }
+                }
+            },
+            "delete": {
+                "tags": [
+                    "object"
+                ],
+                "description": "delete the object",
+                "operationId": "ObjectController.Delete",
+                "parameters": [
+                    {
+                        "in": "path",
+                        "name": "objectId",
+                        "description": "The objectId you want to delete",
+                        "required": true,
+                        "type": "string"
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "{string} delete success!"
+                    },
+                    "403": {
+                        "description": "objectId is empty"
+                    }
+                }
+            }
+        },
+        "/register/": {
+            "get": {
+                "tags": [
+                    "register"
+                ],
+                "description": "register user",
+                "operationId": "RegisterController.Get",
+                "parameters": [
+                    {
+                        "in": "query",
+                        "name": "userName",
+                        "description": "userName of the user",
+                        "required": true,
+                        "type": "string"
+                    },
+                    {
+                        "in": "query",
+                        "name": "password",
+                        "description": "password for basecoin",
+                        "required": true,
+                        "type": "string"
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "schema": {
+                            "$ref": "#/definitions/.user"
+                        }
+                    },
+                    "403": {
+                        "description": ":objectId is empty"
+                    }
+                }
+            }
+        },
+        "/sendTx/": {
+            "get": {
+                "tags": [
+                    "sendTx"
+                ],
+                "description": "sendTx",
+                "operationId": "SendTxController.Get",
+                "parameters": [
+                    {
+                        "in": "query",
+                        "name": "userFrom",
+                        "description": "userName of the user who donate money",
+                        "required": true,
+                        "type": "string"
+                    },
+                    {
+                        "in": "query",
+                        "name": "password",
+                        "description": "password for basecoin",
+                        "required": true,
+                        "type": "string"
+                    },
+                    {
+                        "in": "query",
+                        "name": "userTo",
+                        "description": "userName of who receive donation",
+                        "required": true,
+                        "type": "string"
+                    },
+                    {
+                        "in": "query",
+                        "name": "money",
+                        "description": "the amount of money to  send",
+                        "required": true,
+                        "type": "string"
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "schema": {
+                            "$ref": "#/definitions/.user"
+                        }
+                    },
+                    "403": {
+                        "description": ":objectId is empty"
+                    }
+                }
+            },
+            "post": {
+                "tags": [
+                    "sendTx"
+                ],
+                "description": "sendTx",
+                "operationId": "SendTxController.Post",
+                "parameters": [
+                    {
+                        "in": "query",
+                        "name": "userFrom",
+                        "description": "userName of the user who donate money",
+                        "required": true,
+                        "type": "string"
+                    },
+                    {
+                        "in": "query",
+                        "name": "password",
+                        "description": "password for basecoin",
+                        "required": true,
+                        "type": "string"
+                    },
+                    {
+                        "in": "query",
+                        "name": "userTo",
+                        "description": "userName of who receive donation",
+                        "required": true,
+                        "type": "string"
+                    },
+                    {
+                        "in": "query",
+                        "name": "money",
+                        "description": "the amount of money to  send",
+                        "required": true,
+                        "type": "string"
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "schema": {
+                            "$ref": "#/definitions/.user"
+                        }
+                    },
+                    "403": {
+                        "description": ":objectId is empty"
+                    }
+                }
+            }
+        },
+        "/student/": {
+            "post": {
+                "tags": [
+                    "student"
+                ],
+                "description": "create student",
+                "operationId": "StudentController.Create",
+                "parameters": [
+                    {
+                        "in": "query",
+                        "name": "username",
+                        "description": "The username for login",
+                        "required": true,
+                        "type": "string"
+                    },
+                    {
+                        "in": "query",
+                        "name": "password",
+                        "description": "The password for login",
+                        "required": true,
+                        "type": "string"
+                    },
+                    {
+                        "in": "body",
+                        "name": "body",
+                        "description": "body for student content",
+                        "required": true,
+                        "schema": {
+                            "$ref": "#/definitions/models.Student"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "{string} models.Student.Address"
+                    },
+                    "403": {
+                        "description": "body is empty"
+                    }
+                }
+            }
+        }
+    },
+    "definitions": {
+        ".user": {
+            "type": "object"
+        },
+        "models.Info": {
+            "title": "Info",
+            "type": "object",
+            "properties": {
+                "Birth": {
+                    "type": "string"
+                },
+                "GPA": {
+                    "type": "integer",
+                    "format": "int32"
+                },
+                "LastName": {
+                    "type": "string"
+                },
+                "Major": {
+                    "type": "string"
+                },
+                "Rank": {
+                    "type": "integer",
+                    "format": "int32"
+                },
+                "Score": {
+                    "type": "integer",
+                    "format": "int64"
+                },
+                "firstName": {
+                    "type": "string"
+                }
+            }
+        },
+        "models.Ipfs": {
+            "title": "Ipfs",
+            "type": "object",
+            "properties": {
+                "Address": {
+                    "type": "string"
+                },
+                "Info": {
+                    "$ref": "#/definitions/models.Info"
+                },
+                "IpfsId": {
+                    "type": "string"
+                }
+            }
+        },
+        "models.Object": {
+            "title": "Object",
+            "type": "object",
+            "properties": {
+                "ObjectId": {
+                    "type": "string"
+                },
+                "PlayerName": {
+                    "type": "string"
+                },
+                "Score": {
+                    "type": "integer",
+                    "format": "int64"
+                }
+            }
+        },
+        "models.Student": {
+            "title": "Student",
+            "type": "object",
+            "properties": {
+                "Address": {
+                    "type": "string"
+                },
+                "IpfsId": {
+                    "type": "string"
+                },
+                "Stu_Info": {
+                    "$ref": "#/definitions/models.Info"
+                }
+            }
+        }
+    },
+    "tags": [
+        {
+            "name": "object",
+            "description": "Operations about object\n"
+        },
+        {
+            "name": "ipfs",
+            "description": "Operations about Ipfs\n"
+        },
+        {
+            "name": "student",
+            "description": "Operations about object\n"
+        }
+    ]
+}

@@ -1,0 +1,14 @@
+
+×Ï{
+  "Address": "string",
+  "Info": {
+    "Birth": "string",
+    "GPA": 0,
+    "LastName": "string",
+    "Major": "string",
+    "Rank": 0,
+    "Score": 0,
+    "firstName": "string"
+  },
+  "IpfsId": "string"
+}Ï
