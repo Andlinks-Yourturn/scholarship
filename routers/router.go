@@ -40,6 +40,11 @@ func init() {
 				&controllers.StudentController{},
 			),
 		),
+		beego.NSNamespace("/signature",
+			beego.NSInclude(
+				&controllers.SignatureController{},
+			),
+		),
 	)
 	beego.AddNamespace(ns)
 }

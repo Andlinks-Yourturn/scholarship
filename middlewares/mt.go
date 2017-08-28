@@ -64,6 +64,10 @@ func InsertIntoMT(url string,inputKey string, inputValue string) error{
 
 	fmt.Println("url, ",request)
 	res, err := http.Get(request)
+	if err !=nil{
+		fmt.Println(err)
+		return err
+	}
 	js, err := simplejson.NewFromReader(res.Body) //反序列化
 	if err != nil {
 		panic(err.Error())

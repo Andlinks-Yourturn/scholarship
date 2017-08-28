@@ -221,6 +221,61 @@ paths:
             $ref: '#/definitions/.user'
         "403":
           description: :objectId is empty
+  /signature/{username}/{password}:
+    get:
+      tags:
+      - signature
+      description: find object by objectid
+      operationId: SignatureController.Get
+      parameters:
+      - in: path
+        name: username
+        description: the username you want to verify
+        required: true
+        type: string
+      - in: path
+        name: password
+        description: the password you want to verify
+        required: true
+        type: string
+      - in: body
+        name: body
+        description: The object content
+        required: true
+        schema:
+          $ref: '#/definitions/models.Object'
+      responses:
+        "200":
+          description: '{string} verify success!'
+        "403":
+          description: '{string} verify failure!'
+    post:
+      tags:
+      - signature
+      description: sign json
+      operationId: SignatureController.Sign
+      parameters:
+      - in: body
+        name: body
+        description: The object content
+        required: true
+        schema:
+          $ref: '#/definitions/models.Object'
+      - in: path
+        name: username
+        description: the username you want to sign
+        required: true
+        type: string
+      - in: path
+        name: password
+        description: the password you want to sign
+        required: true
+        type: string
+      responses:
+        "200":
+          description: '{string}'
+        "403":
+          description: sign is fail
   /student/:
     post:
       tags:
@@ -285,9 +340,12 @@ definitions:
         type: string
   models.Object:
     title: Object
+    required:
+    - ObjectId
     type: object
     properties:
       ObjectId:
+        description: renxing
         type: string
       PlayerName:
         type: string
@@ -312,5 +370,8 @@ tags:
   description: |
     Operations about Ipfs
 - name: student
+  description: |
+    Operations about object
+- name: signature
   description: |
     Operations about object

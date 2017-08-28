@@ -119,6 +119,22 @@ func init() {
 			MethodParams: param.Make(),
 			Params: nil})
 
+	beego.GlobalControllerRouter["beeapi/controllers:SignatureController"] = append(beego.GlobalControllerRouter["beeapi/controllers:SignatureController"],
+		beego.ControllerComments{
+			Method: "Sign",
+			Router: `/:username/:password`,
+			AllowHTTPMethods: []string{"post"},
+			MethodParams: param.Make(),
+			Params: nil})
+
+	beego.GlobalControllerRouter["beeapi/controllers:SignatureController"] = append(beego.GlobalControllerRouter["beeapi/controllers:SignatureController"],
+		beego.ControllerComments{
+			Method: "Verify",
+			Router: `/:username/:password`,
+			AllowHTTPMethods: []string{"get"},
+			MethodParams: param.Make(),
+			Params: nil})
+
 	beego.GlobalControllerRouter["beeapi/controllers:StudentController"] = append(beego.GlobalControllerRouter["beeapi/controllers:StudentController"],
 		beego.ControllerComments{
 			Method: "Create",

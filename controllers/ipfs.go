@@ -28,14 +28,6 @@ var (
 // @Failure 403 body is empty
 // @router / [post]
 func (i *IpfsController) Uplaod() {
-
-	//var cmdStr = "ipfs add "+ filePath;
-
-	// 将接受到json 保存为 ipfs对象中
-	//var ipfs models.Ipfs = models.Ipfs{}
-	//if err = json.Unmarshal(i.Ctx.Input.RequestBody, &ipfs);err!=nil{
-	//	fmt.Println("Unmarshal:",err.Error())
-	//}
 	err = ioutil.WriteFile("tmp/output.json",i.Ctx.Input.RequestBody,0666)
 	if err != nil{
 		fmt.Println(err)
