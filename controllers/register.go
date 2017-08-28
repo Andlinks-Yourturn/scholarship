@@ -3,7 +3,7 @@ package controllers
 import (
 	"github.com/astaxie/beego"
 	util  "github.com/tendermint/basecoin/util"
-	"beeapi/models"
+	"scholarship/models"
 	"fmt"
 )
 

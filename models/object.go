@@ -11,7 +11,7 @@ var (
 )
 
 type Object struct {
-	ObjectId   string
+	ObjectId   string	`required:"true" description:"renxing"`
 	Score      int64
 	PlayerName string
 }

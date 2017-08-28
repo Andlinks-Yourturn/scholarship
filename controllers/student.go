@@ -2,7 +2,7 @@ package controllers
 
 import (
 	"github.com/astaxie/beego"
-	m "beeapi/middlewares"
+	m "scholarship/middlewares"
 	"io/ioutil"
 	"fmt"
 	utilPro "github.com/tendermint/basecoin/util"
@@ -29,8 +29,6 @@ func (s *StudentController) Create() {
 		fmt.Println(err)
 	}
 
-
-
 	// 调用 ipfs 函数，
 	err = ioutil.WriteFile("tmp/output.json",s.Ctx.Input.RequestBody,0666)
 	if err != nil{
@@ -47,7 +45,6 @@ func (s *StudentController) Create() {
 		s.Data["json"] = info.Address
 	}
 	s.ServeJSON()
-
 }
 
 // @Title Get

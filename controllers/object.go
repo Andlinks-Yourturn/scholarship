@@ -1,7 +1,7 @@
 package controllers
 
 import (
-	"beeapi/models"
+	"scholarship/models"
 	"encoding/json"
 
 	"github.com/astaxie/beego"
