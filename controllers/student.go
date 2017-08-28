@@ -6,6 +6,9 @@ import (
 	"io/ioutil"
 	"fmt"
 	utilPro "github.com/tendermint/basecoin/util"
+	"scholarship/models"
+	"net/http"
+	"errors"
 )
 
 // Operations about object
@@ -15,56 +18,79 @@ type StudentController struct {
 
 // @Title Create
 // @Description create student
-// @Param	username		query 	string	true		"The username for login"
+// @Param	name		query 	string	true		"The username for login"
 // @Param	password		query 	string	true		"The password for login"
+// @Param	sign		query 	string	true		"The sign for login"
 // @Param	body		body 	models.Student	true		"body for student content"
 // @Success 200 {string} models.Student.Address
 // @Failure 403 body is empty
 // @router / [post]
 func (s *StudentController) Create() {
-	// 调用 生成address 的函数，生成address
 
-	info, err := utilPro.NewKeys(s.GetString("username"),s.GetString("password"))
-	if err !=nil {
-		fmt.Println(err)
-	}
+	// 先verify  后 创建address
 
-	// 调用 ipfs 函数，
-	err = ioutil.WriteFile("tmp/output.json",s.Ctx.Input.RequestBody,0666)
-	if err != nil{
-		fmt.Println(err)
-	}
-	hash, err := m.IpfsUpload("tmp/output.json")
-	if err!=nil{
-		fmt.Println(err)
-	}
-	err = m.InsertIntoMT(beego.AppConfig.String("MTUrl"),info.Address.String(),hash)
+	// "http://localhost:46600/verify?name=&signature=&message="
+	name := s.GetString("name")
+	sign := s.GetString("sign")
+	url := beego.AppConfig.String("BasecoinUrl")+"/verify?name="+name+"&sign="+ sign +"&message="+string(s.Ctx.Input.RequestBody)
+
+	client := &http.Client{}
+	reqest, err := http.NewRequest("GET", url, nil)
 	if err != nil {
+		panic(err)
+	}
+	//处理返回结果
+	response, err := client.Do(reqest)
+	if err !=nil{
 		s.Data["json"] = err
-	}else {
-		s.Data["json"] = info.Address
+	}else{
+		if(response.Status=="true"){
+			// 调用 生成address 的函数，生成address
+			info, err := utilPro.NewKeys(s.GetString("username"),s.GetString("password"))
+			if err !=nil {
+				fmt.Println(err)
+			}
+			// 调用 ipfs 函数，
+			err = ioutil.WriteFile("tmp/output.json",s.Ctx.Input.RequestBody,0666)
+			if err != nil{
+				fmt.Println(err)
+			}
+			hash, err := m.IpfsUpload("tmp/output.json")
+			if err!=nil{
+				fmt.Println(err)
+			}
+			err = m.InsertIntoMT(beego.AppConfig.String("MTUrl"),info.Address.String(),hash)
+			if err != nil {
+				s.Data["json"] = err
+			}else {
+				s.Data["json"] = info.Address
+			}
+		}else{
+			s.Data["json"] = errors.New("验证失败")
+		}
 	}
 	s.ServeJSON()
 }
 
 // @Title Get
-// @Description find object by objectid
-// @Param	objectId		path 	string	true		"the objectid you want to get"
+// @Description find json by ipfsId
+// @Param	objectId		path 	string	true		"the ipfsId you want to get"
 // @Success 200 {object} models.Object
 // @Failure 403 :objectId is empty
-// @router /:objectId [get]
-//func (o *StudentController) Get() {
-//	objectId := o.Ctx.Input.Param(":objectId")
-//	if objectId != "" {
-//		ob, err := models.GetOne(objectId)
-//		if err != nil {
-//			o.Data["json"] = err.Error()
-//		} else {
-//			o.Data["json"] = ob
-//		}
-//	}
-//	o.ServeJSON()
-//}
+// @router /:ipfsId [get]
+func (o *StudentController) Get() {
+
+	objectId := o.Ctx.Input.Param(":ipfsId")
+	if objectId != "" {
+		ob, err := models.GetOne(objectId)
+		if err != nil {
+			o.Data["json"] = err.Error()
+		} else {
+			o.Data["json"] = ob
+		}
+	}
+	o.ServeJSON()
+}
 
 // @Title GetAll
 // @Description get all objects

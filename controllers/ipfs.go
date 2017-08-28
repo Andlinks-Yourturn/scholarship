@@ -42,9 +42,10 @@ func (i *IpfsController) Uplaod() {
 	err := cmd.Run()
 	if err != nil {
 		fmt.Println(fmt.Sprint(err) + ": " + stderr.String())
+		i.Data["json"] = fmt.Sprint(err) + ": " + stderr.String()
+	} else {
+		i.Data["json"]=strings.Split(out.String(), " ")[1]
 	}
-	err = cmd.Run()
-	i.Data["json"]=strings.Split(out.String(), " ")[1]
 	i.ServeJSON()
 }
 

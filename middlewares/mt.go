@@ -35,6 +35,7 @@ func getRequest(inputKey string, inputValue string) string {
 	//string to HEX
 	stringValue := stringToHex(inputValue)
 
+
 	partM := getlength(len(inputKey))
 	partL :=getlength(len(partM))
 
