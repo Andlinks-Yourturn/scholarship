@@ -5,6 +5,9 @@ import (
 	"fmt"
 	"net/http"
 	"io/ioutil"
+
+	"scholarship/models"
+	"net/url"
 )
 
 // Operations about object
@@ -14,20 +17,24 @@ type SignatureController struct {
 
 // @Title Sign
 // @Description sign json
-// @Param	body		body 	models.student	true		"The object content"
-// @Param	username		path 	string	true		"the username you want to sign"
-// @Param	password		path 	string	true		"the password you want to sign"
+// @Param	name		query 	string	true		"the username you want to sign"
+// @Param	password		query 	string	true		"the password you want to sign"
+// @Param	body		body 	models.Student	true		"The object content"
 // @Success 200 {string}
 // @Failure 403 sign is fail
-// @router /:username/:password [post]
+// @router / [post]
 func (s *SignatureController) Sign() {
 	//  "http://localhost:46600/sign?name=ligang&password=1234567890&message=hello"
 	name := s.GetString("name")
 	password := s.GetString("password")
+	fmt.Println(name,password)
 	//get private key from remote basecli
-	url := beego.AppConfig.String("BasecliServiceUrl")
 	client := &http.Client{}
-	url += beego.AppConfig.String("BasecoinUrl")+ "/sign?name="+name+"&message="+ string(s.Ctx.Input.RequestBody) +"&password="+password
+	v := &url.Values{}
+	v.Set("name",name)
+	v.Set("password",password)
+	v.Set("message",string(s.Ctx.Input.RequestBody))
+    url := beego.AppConfig.String("BasecoinUrl")+ "/sign?" + v.Encode()
 	fmt.Println(url)
 	reqest, err := http.NewRequest("GET", url, nil)
 	if err != nil {
@@ -35,6 +42,9 @@ func (s *SignatureController) Sign() {
 	}
 	//处理返回结果
 	response, err := client.Do(reqest)
+	if err != nil{
+		fmt.Println(err)
+	}
 	body, err := ioutil.ReadAll(response.Body)
 	s.Data["json"]=body
 	s.ServeJSON()
@@ -53,3 +63,22 @@ func (o *SignatureController) Verify() {
 }
 
 
+// @Title Get
+// @Description find json by ipfsId
+// @Param	objectId		path 	string	true		"the ipfsId you want to get"
+// @Success 200 {object} models.Object
+// @Failure 403 :objectId is empty
+// @router /:ipfsId [get]
+func (o *SignatureController) Get() {
+
+	objectId := o.Ctx.Input.Param(":ipfsId")
+	if objectId != "" {
+		ob, err := models.GetOne(objectId)
+		if err != nil {
+			o.Data["json"] = err.Error()
+		} else {
+			o.Data["json"] = ob
+		}
+	}
+	o.ServeJSON()
+}

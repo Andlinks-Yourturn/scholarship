@@ -1,7 +1,7 @@
 package main
 
 import (
-	_ "scholarship/controllers"
+	_ "scholarship/routers"
 	"github.com/astaxie/beego"
 )
 

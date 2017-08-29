@@ -5,10 +5,10 @@ import (
 	m "scholarship/middlewares"
 	"io/ioutil"
 	"fmt"
-	utilPro "github.com/tendermint/basecoin/util"
 	"scholarship/models"
 	"net/http"
 	"errors"
+	"encoding/hex"
 )
 
 // Operations about object
@@ -32,8 +32,9 @@ func (s *StudentController) Create() {
 	// "http://localhost:46600/verify?name=&signature=&message="
 	name := s.GetString("name")
 	sign := s.GetString("sign")
-	url := beego.AppConfig.String("BasecoinUrl")+"/verify?name="+name+"&sign="+ sign +"&message="+string(s.Ctx.Input.RequestBody)
+	password := s.GetString("password")
 
+	url := beego.AppConfig.String("BasecoinUrl")+"/verify?name="+name+"&sign="+ sign +"&message="+string(s.Ctx.Input.RequestBody)
 	client := &http.Client{}
 	reqest, err := http.NewRequest("GET", url, nil)
 	if err != nil {
@@ -46,10 +47,25 @@ func (s *StudentController) Create() {
 	}else{
 		if(response.Status=="true"){
 			// 调用 生成address 的函数，生成address
-			info, err := utilPro.NewKeys(s.GetString("username"),s.GetString("password"))
-			if err !=nil {
+			//info, err := utilPro.NewKeys(s.GetString("username"),s.GetString("password"))
+			//if err !=nil {
+			//	fmt.Println(err)
+			//}
+			url := beego.AppConfig.String("BasecoinUrl")+"/register?name="+name +"&password="+password
+			fmt.Println(url)
+			client := &http.Client{}
+			reqest, err := http.NewRequest("GET", url, nil)
+			if err != nil {
+				panic(err)
+			}
+			response, err := client.Do(reqest)
+			body, err := ioutil.ReadAll(response.Body)
+			if err !=nil{
 				fmt.Println(err)
 			}
+			fmt.Println(hex.EncodeToString(body))
+			address := hex.EncodeToString(body)
+
 			// 调用 ipfs 函数，
 			err = ioutil.WriteFile("tmp/output.json",s.Ctx.Input.RequestBody,0666)
 			if err != nil{
@@ -59,11 +75,11 @@ func (s *StudentController) Create() {
 			if err!=nil{
 				fmt.Println(err)
 			}
-			err = m.InsertIntoMT(beego.AppConfig.String("MTUrl"),info.Address.String(),hash)
+			err = m.InsertIntoMT(beego.AppConfig.String("MTUrl"),address,hash)
 			if err != nil {
 				s.Data["json"] = err
 			}else {
-				s.Data["json"] = info.Address
+				s.Data["json"] = address
 			}
 		}else{
 			s.Data["json"] = errors.New("验证失败")
