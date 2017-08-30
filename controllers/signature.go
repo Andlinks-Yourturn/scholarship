@@ -5,9 +5,9 @@ import (
 	"fmt"
 	"net/http"
 	"io/ioutil"
-
 	"scholarship/models"
 	"net/url"
+	"encoding/hex"
 )
 
 // Operations about object
@@ -36,6 +36,7 @@ func (s *SignatureController) Sign() {
 	v.Set("message",string(s.Ctx.Input.RequestBody))
     url := beego.AppConfig.String("BasecoinUrl")+ "/sign?" + v.Encode()
 	fmt.Println(url)
+	fmt.Println(string(s.Ctx.Input.RequestBody))
 	reqest, err := http.NewRequest("GET", url, nil)
 	if err != nil {
 		panic(err)
@@ -46,7 +47,13 @@ func (s *SignatureController) Sign() {
 		fmt.Println(err)
 	}
 	body, err := ioutil.ReadAll(response.Body)
-	s.Data["json"]=body
+	addr := hex.EncodeToString(body)
+	if addr =="fail"{
+		s.Data["json"]="sign  失败"
+
+	}else{
+		s.Data["json"]=addr
+	}
 	s.ServeJSON()
 }
 

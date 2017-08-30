@@ -133,6 +133,34 @@ paths:
           description: '{string} delete success!'
         "403":
           description: objectId is empty
+  /project/:
+    post:
+      tags:
+      - project
+      description: create project
+      operationId: ProjectController.Create
+      parameters:
+      - in: query
+        name: name
+        description: The username for login
+        required: true
+        type: string
+      - in: query
+        name: password
+        description: The password for login
+        required: true
+        type: string
+      - in: body
+        name: body
+        description: body for project content
+        required: true
+        schema:
+          $ref: '#/definitions/models.Project'
+      responses:
+        "200":
+          description: '{string} models.Project.Address'
+        "403":
+          description: body is empty
   /register/:
     get:
       tags:
@@ -221,6 +249,52 @@ paths:
             $ref: '#/definitions/.user'
         "403":
           description: :objectId is empty
+  /signature/:
+    post:
+      tags:
+      - signature
+      description: sign json
+      operationId: SignatureController.Sign
+      parameters:
+      - in: query
+        name: name
+        description: the username you want to sign
+        required: true
+        type: string
+      - in: query
+        name: password
+        description: the password you want to sign
+        required: true
+        type: string
+      - in: body
+        name: body
+        description: The object content
+        required: true
+        schema:
+          $ref: '#/definitions/models.Student'
+      responses:
+        "200":
+          description: '{string}'
+        "403":
+          description: sign is fail
+  /signature/{ipfsId}:
+    get:
+      tags:
+      - signature
+      description: find json by ipfsId
+      operationId: SignatureController.Get
+      parameters:
+      - in: path
+        name: objectId
+        description: the ipfsId you want to get
+        required: true
+        type: string
+      responses:
+        "200":
+          schema:
+            $ref: '#/definitions/models.Object'
+        "403":
+          description: :objectId is empty
   /signature/{username}/{password}:
     get:
       tags:
@@ -249,33 +323,6 @@ paths:
           description: '{string} verify success!'
         "403":
           description: '{string} verify failure!'
-    post:
-      tags:
-      - signature
-      description: sign json
-      operationId: SignatureController.Sign
-      parameters:
-      - in: body
-        name: body
-        description: The object content
-        required: true
-        schema:
-          $ref: '#/definitions/models.Object'
-      - in: path
-        name: username
-        description: the username you want to sign
-        required: true
-        type: string
-      - in: path
-        name: password
-        description: the password you want to sign
-        required: true
-        type: string
-      responses:
-        "200":
-          description: '{string}'
-        "403":
-          description: sign is fail
   /student/:
     post:
       tags:
@@ -284,13 +331,23 @@ paths:
       operationId: StudentController.Create
       parameters:
       - in: query
-        name: username
+        name: name
         description: The username for login
+        required: true
+        type: string
+      - in: query
+        name: tea_name
+        description: The tea_username for login
         required: true
         type: string
       - in: query
         name: password
         description: The password for login
+        required: true
+        type: string
+      - in: query
+        name: sign
+        description: The sign for login
         required: true
         type: string
       - in: body
@@ -304,6 +361,24 @@ paths:
           description: '{string} models.Student.Address'
         "403":
           description: body is empty
+  /student/{ipfsId}:
+    get:
+      tags:
+      - student
+      description: find json by ipfsId
+      operationId: StudentController.Get
+      parameters:
+      - in: path
+        name: objectId
+        description: the ipfsId you want to get
+        required: true
+        type: string
+      responses:
+        "200":
+          schema:
+            $ref: '#/definitions/models.Object'
+        "403":
+          description: :objectId is empty
 definitions:
   .user:
     type: object
@@ -352,6 +427,35 @@ definitions:
       Score:
         type: integer
         format: int64
+  models.Pro_Info:
+    title: Pro_Info
+    type: object
+    properties:
+      Birth:
+        type: string
+      GPA:
+        type: integer
+        format: int32
+      Major:
+        type: string
+      Rank:
+        type: integer
+        format: int32
+      Score:
+        type: integer
+        format: int64
+      Time:
+        type: string
+  models.Project:
+    title: Project
+    type: object
+    properties:
+      Address:
+        type: string
+      IpfsId:
+        type: string
+      Pro_Info:
+        $ref: '#/definitions/models.Pro_Info'
   models.Student:
     title: Student
     type: object
@@ -370,6 +474,9 @@ tags:
   description: |
     Operations about Ipfs
 - name: student
+  description: |
+    Operations about object
+- name: project
   description: |
     Operations about object
 - name: signature
