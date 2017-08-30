@@ -7,8 +7,8 @@ import (
 	"fmt"
 	"scholarship/models"
 	"net/http"
-	"errors"
 	"encoding/hex"
+	"net/url"
 )
 
 // Operations about object
@@ -19,6 +19,7 @@ type StudentController struct {
 // @Title Create
 // @Description create student
 // @Param	name		query 	string	true		"The username for login"
+// @Param	tea_name		query 	string	true		"The tea_username for login"
 // @Param	password		query 	string	true		"The password for login"
 // @Param	sign		query 	string	true		"The sign for login"
 // @Param	body		body 	models.Student	true		"body for student content"
@@ -31,10 +32,16 @@ func (s *StudentController) Create() {
 
 	// "http://localhost:46600/verify?name=&signature=&message="
 	name := s.GetString("name")
+	tea_name := s.GetString("tea_name")
 	sign := s.GetString("sign")
 	password := s.GetString("password")
 
-	url := beego.AppConfig.String("BasecoinUrl")+"/verify?name="+name+"&sign="+ sign +"&message="+string(s.Ctx.Input.RequestBody)
+	v := &url.Values{}
+	v.Set("name",tea_name)
+	v.Set("signature",sign)
+	v.Set("message",string(s.Ctx.Input.RequestBody))
+	url := beego.AppConfig.String("BasecoinUrl")+ "/verify?" + v.Encode()
+	fmt.Println(url)
 	client := &http.Client{}
 	reqest, err := http.NewRequest("GET", url, nil)
 	if err != nil {
@@ -42,19 +49,21 @@ func (s *StudentController) Create() {
 	}
 	//处理返回结果
 	response, err := client.Do(reqest)
+	body, err := ioutil.ReadAll(response.Body)
+	fmt.Println(string(body))
 	if err !=nil{
 		s.Data["json"] = err
 	}else{
-		if(response.Status=="true"){
+		if(string(body)!= "false"){
 			// 调用 生成address 的函数，生成address
 			//info, err := utilPro.NewKeys(s.GetString("username"),s.GetString("password"))
 			//if err !=nil {
 			//	fmt.Println(err)
 			//}
-			url := beego.AppConfig.String("BasecoinUrl")+"/register?name="+name +"&password="+password
-			fmt.Println(url)
+			url2 := beego.AppConfig.String("BasecoinUrl")+"/register?name="+name +"&password="+password
+			fmt.Println(url2)
 			client := &http.Client{}
-			reqest, err := http.NewRequest("GET", url, nil)
+			reqest, err := http.NewRequest("GET", url2, nil)
 			if err != nil {
 				panic(err)
 			}
@@ -82,7 +91,7 @@ func (s *StudentController) Create() {
 				s.Data["json"] = address
 			}
 		}else{
-			s.Data["json"] = errors.New("验证失败")
+			s.Data["json"] = "验证失败"
 		}
 	}
 	s.ServeJSON()
@@ -90,13 +99,13 @@ func (s *StudentController) Create() {
 
 // @Title Get
 // @Description find json by ipfsId
-// @Param	objectId		path 	string	true		"the ipfsId you want to get"
+// @Param	name		path 	string	true		"the ipfsId you want to get"
 // @Success 200 {object} models.Object
 // @Failure 403 :objectId is empty
-// @router /:ipfsId [get]
+// @router /:name [get]
 func (o *StudentController) Get() {
 
-	objectId := o.Ctx.Input.Param(":ipfsId")
+	objectId := o.Ctx.Input.Param(":name")
 	if objectId != "" {
 		ob, err := models.GetOne(objectId)
 		if err != nil {
