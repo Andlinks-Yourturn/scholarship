@@ -20,9 +20,9 @@ func init() {
 				&controllers.ObjectController{},
 			),
 		),
-		beego.NSNamespace("/register",
+		beego.NSNamespace("/user",
 			beego.NSInclude(
-				&controllers.RegisterController{},
+				&controllers.UserController{},
 			),
 		),
 		beego.NSNamespace("/sendTx",
@@ -48,6 +48,11 @@ func init() {
 		beego.NSNamespace("/signature",
 			beego.NSInclude(
 				&controllers.SignatureController{},
+			),
+		),
+		beego.NSNamespace("/recharge",
+			beego.NSInclude(
+				&controllers.RechargeController{},
 			),
 		),
 	)

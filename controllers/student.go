@@ -20,7 +20,7 @@ type StudentController struct {
 // @Description create student
 // @Param	name		query 	string	true		"The username for login"
 // @Param	tea_name		query 	string	true		"The tea_username for login"
-// @Param	password		query 	string	true		"The password for login"
+// @Param	password		query 	string	true		"The password for student to operator"
 // @Param	sign		query 	string	true		"The sign for login"
 // @Param	body		body 	models.Student	true		"body for student content"
 // @Success 200 {string} models.Student.Address
@@ -29,8 +29,9 @@ type StudentController struct {
 func (s *StudentController) Create() {
 
 	// 先verify  后 创建address
-
+	//http://192.168.1.64:46600/
 	// "http://localhost:46600/verify?name=&signature=&message="
+	var result models.ApiResult
 	name := s.GetString("name")
 	tea_name := s.GetString("tea_name")
 	sign := s.GetString("sign")
@@ -52,7 +53,9 @@ func (s *StudentController) Create() {
 	body, err := ioutil.ReadAll(response.Body)
 	fmt.Println(string(body))
 	if err !=nil{
-		s.Data["json"] = err
+		result.Result = "false"
+		result.Data = ""
+		s.Data["json"] = result
 	}else{
 		if(string(body)!= "false"){
 			// 调用 生成address 的函数，生成address
@@ -86,9 +89,13 @@ func (s *StudentController) Create() {
 			}
 			err = m.InsertIntoMT(beego.AppConfig.String("MTUrl"),address,hash)
 			if err != nil {
-				s.Data["json"] = err
+				result.Result = "false"
+				result.Data = ""
+				s.Data["json"] = result
 			}else {
-				s.Data["json"] = address
+				result.Result = "true"
+				result.Data = address
+				s.Data["json"] = result
 			}
 		}else{
 			s.Data["json"] = "验证失败"
@@ -103,7 +110,7 @@ func (s *StudentController) Create() {
 // @Success 200 {object} models.Object
 // @Failure 403 :objectId is empty
 // @router /:name [get]
-func (o *StudentController) Get() {
+func (o *StudentController) GetRelateStudent() {
 
 	objectId := o.Ctx.Input.Param(":name")
 	if objectId != "" {
