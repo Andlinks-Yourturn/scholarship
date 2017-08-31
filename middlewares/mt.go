@@ -87,6 +87,64 @@ func InsertIntoMT(url string,inputKey string, inputValue string) error{
 
 }
 
+//发送比较文件的请求
+func getFileRequest(projectKey string, studentKey string) string {
+	//编码
+	//string to HEX
+	//stringValue := stringToHex(inputValue)
+	partM := getlength(len(projectKey))
+	partL :=getlength(len(partM))
+
+	fmt.Println("lenK: ",partL," ",partM)
+
+	retultK :=partL+partM+projectKey
+
+
+	partM = getlength(len(studentKey))
+	partL =getlength(len(partM))
+
+
+	fmt.Println("lenM: ",partM," ",partL)
+	retultV :=partL+partM+studentKey
+
+	reault := "0x02"+retultK+retultV
+
+	return reault
+
+
+}
+
+func Comparefiles(url string,projectKey string, studentKey string) string{
+
+	request := url+"/broadcast_tx_commit?tx="+getFileRequest(projectKey,studentKey)
+
+	fmt.Println("url, ",request)
+	res, err := http.Get(request)
+	js, err := simplejson.NewFromReader(res.Body) //反序列化
+	if err != nil {
+		panic(err.Error())
+	}
+
+	info := js.Get("result").Get("deliver_tx").Get("data").MustString()
+
+
+	fmt.Println("compare result ", info)
+	result, err := hex.DecodeString(info)
+	if err != nil {
+		panic(err)
+	}
+
+	fmt.Printf("%s\n", result)
+	if string(result) == "Matched"{
+		return "success"
+	}else{
+		return "failure"
+	}
+
+}
+
+
+
 func searchValue(url string, inputKey string) string{
 
 	//request := url+"/abci_query?data=0x"+inputKey+"&path=\"\"&prove=false"

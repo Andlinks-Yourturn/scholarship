@@ -1,6 +1,9 @@
 .DS_Store
 .idea/
 swagger.zip
+swagger/swagger.json
+swagger/swagger.yml
 lastupdate.tmp
-tmp
+tmp/*
 scholarship
+commentsRouter___________________Users_pei_go_src_scholarship_controllers.go

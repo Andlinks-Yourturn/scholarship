@@ -81,33 +81,9 @@ func init() {
 
 	beego.GlobalControllerRouter["scholarship/controllers:ScholarshipController"] = append(beego.GlobalControllerRouter["scholarship/controllers:ScholarshipController"],
 		beego.ControllerComments{
-			Method: "Post",
-			Router: `/`,
-			AllowHTTPMethods: []string{"post"},
-			MethodParams: param.Make(),
-			Params: nil})
-
-	beego.GlobalControllerRouter["scholarship/controllers:ScholarshipController"] = append(beego.GlobalControllerRouter["scholarship/controllers:ScholarshipController"],
-		beego.ControllerComments{
-			Method: "GetAll",
+			Method: "Match",
 			Router: `/`,
 			AllowHTTPMethods: []string{"get"},
-			MethodParams: param.Make(),
-			Params: nil})
-
-	beego.GlobalControllerRouter["scholarship/controllers:ScholarshipController"] = append(beego.GlobalControllerRouter["scholarship/controllers:ScholarshipController"],
-		beego.ControllerComments{
-			Method: "Get",
-			Router: `/:objectId`,
-			AllowHTTPMethods: []string{"get"},
-			MethodParams: param.Make(),
-			Params: nil})
-
-	beego.GlobalControllerRouter["scholarship/controllers:ScholarshipController"] = append(beego.GlobalControllerRouter["scholarship/controllers:ScholarshipController"],
-		beego.ControllerComments{
-			Method: "Put",
-			Router: `/:objectId`,
-			AllowHTTPMethods: []string{"put"},
 			MethodParams: param.Make(),
 			Params: nil})
 
@@ -162,7 +138,7 @@ func init() {
 	beego.GlobalControllerRouter["scholarship/controllers:StudentController"] = append(beego.GlobalControllerRouter["scholarship/controllers:StudentController"],
 		beego.ControllerComments{
 			Method: "Get",
-			Router: `/:ipfsId`,
+			Router: `/:name`,
 			AllowHTTPMethods: []string{"get"},
 			MethodParams: param.Make(),
 			Params: nil})

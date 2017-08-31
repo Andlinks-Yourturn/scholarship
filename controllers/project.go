@@ -7,6 +7,7 @@ import (
 	"io/ioutil"
 	"net/http"
 	"encoding/hex"
+	"net/url"
 )
 
 // Operations about object
@@ -17,8 +18,11 @@ type ProjectController struct {
 
 // @Title Create
 // @Description create project
-// @Param	name		query 	string	true		"The username for login"
-// @Param	password		query 	string	true		"The password for login"
+// @Param	name		query 	string	true		"The name for project"
+// @Param	password		query 	string	true		"The password for project"
+// @Param	self_name		query 	string	true		"The name for himself"
+// @Param	self_password		query 	string	true		"The password for himself"
+// @Param	value		query 	string	true		"The value for project, like "1000mycoin""
 // @Param	body		body 	models.Project	true		"body for project content"
 // @Success 200 {string} models.Project.Address
 // @Failure 403 body is empty
@@ -30,10 +34,10 @@ func (p *ProjectController) Post() {
 	//"http://localhost:46600/register?name=&password="
 	name := p.GetString("name")
 	password := p.GetString("password")
-	url := beego.AppConfig.String("BasecoinUrl")+"/register?name="+name +"&password="+password
-	fmt.Println(url)
+	url1 := beego.AppConfig.String("BasecoinUrl")+"/register?name="+name +"&password="+password
+	fmt.Println(url1)
 	client := &http.Client{}
-	reqest, err := http.NewRequest("GET", url, nil)
+	reqest, err := http.NewRequest("GET", url1, nil)
 	if err != nil {
 		panic(err)
 	}
@@ -59,10 +63,39 @@ func (p *ProjectController) Post() {
 	fmt.Println(hex.EncodeToString(body))
 	address := hex.EncodeToString(body)
 	err = m.InsertIntoMT(beego.AppConfig.String("MTUrl"), address,hash)
+
 	if err != nil {
 		p.Data["json"] = err
 	}else {
-		p.Data["json"] = address
+		// 开始转账
+		//"http://localhost:46600/sendTx?userFrom=&password=&money=&userToAddress"
+		//the value of money should be like "1000mycoin"
+		value := p.GetString("value")
+		self_name := p.GetString("self_name")
+		self_password := p.GetString("self_password")
+		v := &url.Values{}
+		v.Set("userToAddress",address)
+		v.Set("userFrom",self_name)
+		v.Set("password",self_password)
+		v.Set("money",value)
+		url2  := beego.AppConfig.String("BasecoinUrl")+"/sendTx?"+v.Encode()
+		fmt.Println(url2)
+		request, err := http.NewRequest("GET", url2, nil)
+		if err != nil {
+			panic(err)
+		}
+		//处理返回结果
+		response, err := client.Do(request)
+		if err != nil{
+			fmt.Println(err)
+		}
+		body, err := ioutil.ReadAll(response.Body)
+		if string(body) =="true"{
+			p.Data["json"] = address
+		}else{
+			fmt.Println("转账失败")
+			p.Data["json"] = address
+		}
 	}
 	p.ServeJSON()
 }

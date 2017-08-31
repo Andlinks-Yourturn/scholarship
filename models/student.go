@@ -3,17 +3,15 @@ package models
 
 
 type Student struct {
-	IpfsId   string
-	Address    string
-	Stu_Info	Info
+	name   string
+	criteria	Criteria
 }
 
-type Stu_Info struct {
-	firstName	string
-	LastName	string
-	Birth	string
-	Major	string
+type Criteria struct {
+	age     int
+	rank	int
+	major	string
+	amount	int
 	GPA		int8
-	Rank	int16
 	Score      int64
 }

@@ -20,8 +20,8 @@ type SignatureController struct {
 // @Param	name		query 	string	true		"the username you want to sign"
 // @Param	password		query 	string	true		"the password you want to sign"
 // @Param	body		body 	models.Student	true		"The object content"
-// @Success 200 {string}
-// @Failure 403 sign is fail
+// @Success 200 {object} models.ApiResult
+// @Failure 403 {object} models.ApiResult
 // @router / [post]
 func (s *SignatureController) Sign() {
 	//  "http://localhost:46600/sign?name=ligang&password=1234567890&message=hello"
@@ -47,13 +47,16 @@ func (s *SignatureController) Sign() {
 		fmt.Println(err)
 	}
 	body, err := ioutil.ReadAll(response.Body)
-	addr := hex.EncodeToString(body)
-	if addr =="fail"{
-		s.Data["json"]="sign  失败"
-
+	//res :=&models.ApiResult{}
+	var res models.ApiResult
+	if string(body) =="false"{
+		res.Result = "fa"
+		res.Data = "sign fail"
 	}else{
-		s.Data["json"]=addr
+		res.Result = "true"
+		res.Data = hex.EncodeToString(body)
 	}
+	s.Data["json"] = res
 	s.ServeJSON()
 }
 
