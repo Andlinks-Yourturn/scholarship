@@ -7,6 +7,8 @@ import (
 	"io/ioutil"
 	"net/http"
 	"encoding/hex"
+	"scholarship/models"
+	"net/url"
 )
 
 // Operations about object
@@ -28,12 +30,14 @@ func (p *ProjectController) Post() {
 	// 调用 生成address 的函数，生成address
 
 	//"http://localhost:46600/register?name=&password="
+
+	var result models.ApiResult
 	name := p.GetString("name")
 	password := p.GetString("password")
-	url := beego.AppConfig.String("BasecoinUrl")+"/register?name="+name +"&password="+password
-	fmt.Println(url)
+	url1 := beego.AppConfig.String("BasecoinUrl")+"/register?name="+name +"&password="+password
+	fmt.Println(url1)
 	client := &http.Client{}
-	reqest, err := http.NewRequest("GET", url, nil)
+	reqest, err := http.NewRequest("GET", url1, nil)
 	if err != nil {
 		panic(err)
 	}
@@ -59,10 +63,50 @@ func (p *ProjectController) Post() {
 	fmt.Println(hex.EncodeToString(body))
 	address := hex.EncodeToString(body)
 	err = m.InsertIntoMT(beego.AppConfig.String("MTUrl"), address,hash)
+
 	if err != nil {
-		p.Data["json"] = err
+		result.Result = "false"
+		result.Data = err
+		p.Data["json"] = result
 	}else {
-		p.Data["json"] = address
+		// 开始转账
+		//"http://localhost:46600/sendTx?userFrom=&password=&money=&userToAddress"
+		//the value of money should be like "1000mycoin"
+		value := p.GetString("value")
+		self_name := p.GetString("self_name")
+		self_password := p.GetString("self_password")
+
+		//whether balance is enough to create
+		urlForBalance := beego.AppConfig.String("BasecoinUrl")+"/query/account/balance?address="
+
+
+		v := &url.Values{}
+		v.Set("userToAddress",address)
+		v.Set("userFrom",self_name)
+		v.Set("password",self_password)
+		v.Set("money",value)
+		url2  := beego.AppConfig.String("BasecoinUrl")+"/sendTx?"+v.Encode()
+		fmt.Println(url2)
+		request, err := http.NewRequest("GET", url2, nil)
+		if err != nil {
+			panic(err)
+		}
+		//处理返回结果
+		response, err := client.Do(request)
+		if err != nil{
+			fmt.Println(err)
+		}
+		body, err := ioutil.ReadAll(response.Body)
+		if string(body) =="true"{
+			result.Result = "true"
+			result.Data = address
+			p.Data["json"] = result
+		}else{
+			fmt.Println("转账失败")
+			result.Result = "false"
+			result.Data = address
+			p.Data["json"] = address
+		}
 	}
 	p.ServeJSON()
 }

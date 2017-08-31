@@ -55,6 +55,16 @@ func init() {
 				&controllers.RechargeController{},
 			),
 		),
+		beego.NSNamespace("/account",
+			beego.NSInclude(
+				&controllers.AccountController{},
+			),
+		),
+		beego.NSNamespace("/accountBalances",
+			beego.NSInclude(
+				&controllers.AccountBalanceController{},
+			),
+		),
 	)
 	beego.AddNamespace(ns)
 }
