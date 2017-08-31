@@ -245,41 +245,6 @@
                 }
             }
         },
-        "/register/": {
-            "get": {
-                "tags": [
-                    "register"
-                ],
-                "description": "register user",
-                "operationId": "RegisterController.Get",
-                "parameters": [
-                    {
-                        "in": "query",
-                        "name": "userName",
-                        "description": "userName of the user",
-                        "required": true,
-                        "type": "string"
-                    },
-                    {
-                        "in": "query",
-                        "name": "password",
-                        "description": "password for basecoin",
-                        "required": true,
-                        "type": "string"
-                    }
-                ],
-                "responses": {
-                    "200": {
-                        "schema": {
-                            "$ref": "#/definitions/.user"
-                        }
-                    },
-                    "403": {
-                        "description": ":objectId is empty"
-                    }
-                }
-            }
-        },
         "/sendTx/": {
             "get": {
                 "tags": [
@@ -456,7 +421,7 @@
                 "parameters": [
                     {
                         "in": "path",
-                        "name": "username",
+                        "name": "name",
                         "description": "the username you want to verify",
                         "required": true,
                         "type": "string"
@@ -544,7 +509,7 @@
                 }
             }
         },
-        "/student/{ipfsId}": {
+        "/student/{name}": {
             "get": {
                 "tags": [
                     "student"
@@ -554,7 +519,7 @@
                 "parameters": [
                     {
                         "in": "path",
-                        "name": "objectId",
+                        "name": "name",
                         "description": "the ipfsId you want to get",
                         "required": true,
                         "type": "string"
@@ -564,6 +529,41 @@
                     "200": {
                         "schema": {
                             "$ref": "#/definitions/models.Object"
+                        }
+                    },
+                    "403": {
+                        "description": ":objectId is empty"
+                    }
+                }
+            }
+        },
+        "/user/": {
+            "get": {
+                "tags": [
+                    "user"
+                ],
+                "description": "register user",
+                "operationId": "UserController.Get",
+                "parameters": [
+                    {
+                        "in": "query",
+                        "name": "name",
+                        "description": "userName of the user",
+                        "required": true,
+                        "type": "string"
+                    },
+                    {
+                        "in": "query",
+                        "name": "password",
+                        "description": "password for basecoin",
+                        "required": true,
+                        "type": "string"
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "schema": {
+                            "$ref": "#/definitions/.user"
                         }
                     },
                     "403": {

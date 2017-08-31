@@ -161,29 +161,6 @@ paths:
           description: '{string} models.Project.Address'
         "403":
           description: body is empty
-  /register/:
-    get:
-      tags:
-      - register
-      description: register user
-      operationId: RegisterController.Get
-      parameters:
-      - in: query
-        name: userName
-        description: userName of the user
-        required: true
-        type: string
-      - in: query
-        name: password
-        description: password for basecoin
-        required: true
-        type: string
-      responses:
-        "200":
-          schema:
-            $ref: '#/definitions/.user'
-        "403":
-          description: :objectId is empty
   /sendTx/:
     get:
       tags:
@@ -303,7 +280,7 @@ paths:
       operationId: SignatureController.Get
       parameters:
       - in: path
-        name: username
+        name: name
         description: the username you want to verify
         required: true
         type: string
@@ -361,7 +338,7 @@ paths:
           description: '{string} models.Student.Address'
         "403":
           description: body is empty
-  /student/{ipfsId}:
+  /student/{name}:
     get:
       tags:
       - student
@@ -369,7 +346,7 @@ paths:
       operationId: StudentController.Get
       parameters:
       - in: path
-        name: objectId
+        name: name
         description: the ipfsId you want to get
         required: true
         type: string
@@ -377,6 +354,29 @@ paths:
         "200":
           schema:
             $ref: '#/definitions/models.Object'
+        "403":
+          description: :objectId is empty
+  /user/:
+    get:
+      tags:
+      - user
+      description: register user
+      operationId: UserController.Get
+      parameters:
+      - in: query
+        name: name
+        description: userName of the user
+        required: true
+        type: string
+      - in: query
+        name: password
+        description: password for basecoin
+        required: true
+        type: string
+      responses:
+        "200":
+          schema:
+            $ref: '#/definitions/.user'
         "403":
           description: :objectId is empty
 definitions:
