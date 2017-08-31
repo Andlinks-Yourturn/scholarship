@@ -71,14 +71,6 @@ func init() {
 			MethodParams: param.Make(),
 			Params: nil})
 
-	beego.GlobalControllerRouter["scholarship/controllers:RegisterController"] = append(beego.GlobalControllerRouter["scholarship/controllers:RegisterController"],
-		beego.ControllerComments{
-			Method: "Get",
-			Router: `/`,
-			AllowHTTPMethods: []string{"get"},
-			MethodParams: param.Make(),
-			Params: nil})
-
 	beego.GlobalControllerRouter["scholarship/controllers:ScholarshipController"] = append(beego.GlobalControllerRouter["scholarship/controllers:ScholarshipController"],
 		beego.ControllerComments{
 			Method: "Match",
@@ -139,6 +131,14 @@ func init() {
 		beego.ControllerComments{
 			Method: "Get",
 			Router: `/:name`,
+			AllowHTTPMethods: []string{"get"},
+			MethodParams: param.Make(),
+			Params: nil})
+
+	beego.GlobalControllerRouter["scholarship/controllers:UserController"] = append(beego.GlobalControllerRouter["scholarship/controllers:UserController"],
+		beego.ControllerComments{
+			Method: "Get",
+			Router: `/`,
 			AllowHTTPMethods: []string{"get"},
 			MethodParams: param.Make(),
 			Params: nil})

@@ -2,8 +2,10 @@ package controllers
 
 import (
 	"github.com/astaxie/beego"
-	util  "github.com/tendermint/basecoin/util"
 	"fmt"
+	"io/ioutil"
+	"net/http"
+	"scholarship/models"
 )
 
 type SendTxController struct {
@@ -27,12 +29,26 @@ func (sendTX * SendTxController) Post(){
 	userTo := sendTX.GetString("userTo")
 	money := sendTX.GetString("money")
 
-	err :=  util.SendTx(userFrom, password, money, userTo,"test_chain_id")
-	util.QueryBalance(userTo, "localhost", "46657")
+	//"http://localhost:46600/sendTx?userFrom=&password=&money=&userToAddress"
+
+	url :=   beego.AppConfig.String("BasecoinUrl")+"/sendTx?userFrom="+userFrom+
+				"&password="+password+"&money="+money+"&userToAddress="+userTo
+	fmt.Println(url)
+
+
+	client := &http.Client{}
+	reqest, err := http.NewRequest("GET", url, nil)
+	if err != nil {
+		panic(err)
+	}
+	response, err := client.Do(reqest)
+	body, err := ioutil.ReadAll(response.Body)
 	if err != nil{
 		sendTX.Data["json"] = err
-	}else{
-		sendTX.Data["json"] = "OK"
+	}else if string(body) == "false"{
+		sendTX.Data["json"] = "fail to sendTx"
+	}else {
+		sendTX.Data["json"] = "true"
 	}
 	sendTX.ServeJSON()
 }
@@ -49,20 +65,35 @@ func (sendTX * SendTxController) Post(){
 // @Failure 403 :objectId is empty
 // @router / [get]
 func (sendTX * SendTxController) Get(){
+	var result models.ApiResult
 	userFrom := sendTX.GetString("userFrom")
 	password := sendTX.GetString("password")
 	userTo := sendTX.GetString("userTo")
 	money := sendTX.GetString("money")
-	//util.SendTx("ligang", "1234567890", "1mycoin", "19D4B36BAAA7B203B301CB86F543EB2F49E34D39", "test_chain_id")
-	fmt.Println(userFrom+userTo+password+money)
-	err :=  util.SendTx(userFrom, password, money, userTo,"test_chain_id")
-	fmt.Println("query balance")
-	util.QueryBalance(userTo, "localhost", "46657")
+
+	//"http://localhost:46600/sendTx?userFrom=&password=&money=&userToAddress"
+
+	url :=   beego.AppConfig.String("BasecoinUrl")+"/sendTx?userFrom="+userFrom+
+		"&password="+password+"&money="+money+"&userToAddress="+userTo
+	fmt.Println(url)
+
+	client := &http.Client{}
+	reqest, err := http.NewRequest("GET", url, nil)
+	if err != nil {
+		panic(err)
+	}
+	response, err := client.Do(reqest)
+	body, err := ioutil.ReadAll(response.Body)
 	if err != nil{
-		sendTX.Data["json"] = err
-	}else{
-		sendTX.Data["json"] = "OK"
+		result.Result = "false"
+		sendTX.Data["json"] = result
+	}else if string(body) == "false"{
+		result.Result = "false"
+		result.Data = "fail to sendTx"
+		sendTX.Data["json"] = result
+	}else {
+		result.Result = "true"
+		sendTX.Data["json"] = result
 	}
 	sendTX.ServeJSON()
-
 }

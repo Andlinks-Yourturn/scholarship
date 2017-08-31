@@ -20,13 +20,14 @@ type SignatureController struct {
 // @Param	name		query 	string	true		"the username you want to sign"
 // @Param	password		query 	string	true		"the password you want to sign"
 // @Param	body		body 	models.Student	true		"The object content"
-// @Success 200 {object} models.ApiResult
-// @Failure 403 {object} models.ApiResult
-// @router / [post]
+// @Success 200 {string}
+// @Failure 403 sign is fail
+// @router / [get]
 func (s *SignatureController) Sign() {
 	//  "http://localhost:46600/sign?name=ligang&password=1234567890&message=hello"
 	name := s.GetString("name")
 	password := s.GetString("password")
+
 	fmt.Println(name,password)
 	//get private key from remote basecli
 	client := &http.Client{}
@@ -47,11 +48,10 @@ func (s *SignatureController) Sign() {
 		fmt.Println(err)
 	}
 	body, err := ioutil.ReadAll(response.Body)
-	//res :=&models.ApiResult{}
-	var res models.ApiResult
-	if string(body) =="false"{
-		res.Result = "fa"
-		res.Data = "sign fail"
+	addr := hex.EncodeToString(body)
+	if addr =="false"{
+		s.Data["json"]="sign  失败"
+
 	}else{
 		res.Result = "true"
 		res.Data = hex.EncodeToString(body)
@@ -62,14 +62,42 @@ func (s *SignatureController) Sign() {
 
 // @Title Get
 // @Description find object by objectid
-// @Param	username		path 	string	true		"the username you want to verify"
+// @Param	name		path 	string	true		"the username you want to verify"
 // @Param	password		path 	string	true		"the password you want to verify"
 // @Param	body		body 	models.Object	true		"The object content"
 // @Success 200 {string} verify success!
 // @Failure 403 {string} verify failure!
 // @router /:username/:password [get]
-func (o *SignatureController) Verify() {
+func (s *SignatureController) Verify() {
+	// "http://localhost:46600/verify?name=&signature=&message="
+	name := s.GetString("name")
+	signature := s.GetString("signature")
 
+	v := &url.Values{}
+	v.Set("name",name)
+	v.Set("signature",signature)
+	v.Set("message",string(s.Ctx.Input.RequestBody))
+	url := beego.AppConfig.String("BasecoinUrl")+ "/verify?" + v.Encode()
+	fmt.Println(url)
+
+	client := &http.Client{}
+	reqest, err := http.NewRequest("GET", url, nil)
+	if err != nil {
+		panic(err)
+	}
+	//处理返回结果
+	response, err := client.Do(reqest)
+	body, err := ioutil.ReadAll(response.Body)
+	fmt.Println(string(body))
+
+	if err != nil{
+		s.Data["json"] = err
+	}else if string(body) == "false"{
+		s.Data["json"] = "false"
+	}else{
+		s.Data["josn"] = "true"
+	}
+	s.ServeJSON()
 }
 
 
@@ -79,16 +107,16 @@ func (o *SignatureController) Verify() {
 // @Success 200 {object} models.Object
 // @Failure 403 :objectId is empty
 // @router /:ipfsId [get]
-func (o *SignatureController) Get() {
+func (s *SignatureController) Get() {
 
-	objectId := o.Ctx.Input.Param(":ipfsId")
+	objectId := s.Ctx.Input.Param(":ipfsId")
 	if objectId != "" {
 		ob, err := models.GetOne(objectId)
 		if err != nil {
-			o.Data["json"] = err.Error()
+			s.Data["json"] = err.Error()
 		} else {
-			o.Data["json"] = ob
+			s.Data["json"] = ob
 		}
 	}
-	o.ServeJSON()
+	s.ServeJSON()
 }
