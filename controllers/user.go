@@ -40,7 +40,6 @@ func (user * UserController)Get(){
 	response, err := client.Do(reqest)
 	body, err := ioutil.ReadAll(response.Body)
 	fmt.Println(string(body))
-
 	if err != nil{
 		result.Result = "false"
 		result.Data = ""

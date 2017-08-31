@@ -1,6 +1,6 @@
 package models
 
 type ApiResult struct{
-	Result	string
-	Data	string
+	Result	interface{}
+	Data	interface{}
 }

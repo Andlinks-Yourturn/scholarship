@@ -49,6 +49,7 @@ func (s *SignatureController) Sign() {
 	}
 	body, err := ioutil.ReadAll(response.Body)
 	addr := hex.EncodeToString(body)
+	res := &models.ApiResult{}
 	if addr =="false"{
 		s.Data["json"]="sign  失败"
 
