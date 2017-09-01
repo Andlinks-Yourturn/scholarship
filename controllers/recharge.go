@@ -13,7 +13,7 @@ type RechargeController struct {
 }
 
 // @Title Get
-// @Description  recharge hide two Paramter userFrom & password
+// @Description   recharge hide two Paramter userFrom & password
 // @Param  userTo  query string  true  "userName of who receive donation"
 // @Param  money    query string true "the amount of money to  send "
 // @Success 200 {object} models.user

@@ -71,6 +71,22 @@ func init() {
 			MethodParams: param.Make(),
 			Params: nil})
 
+	beego.GlobalControllerRouter["scholarship/controllers:ReController"] = append(beego.GlobalControllerRouter["scholarship/controllers:ReController"],
+		beego.ControllerComments{
+			Method: "Get",
+			Router: `/`,
+			AllowHTTPMethods: []string{"get"},
+			MethodParams: param.Make(),
+			Params: nil})
+
+	beego.GlobalControllerRouter["scholarship/controllers:RechargeController"] = append(beego.GlobalControllerRouter["scholarship/controllers:RechargeController"],
+		beego.ControllerComments{
+			Method: "Get",
+			Router: `/`,
+			AllowHTTPMethods: []string{"get"},
+			MethodParams: param.Make(),
+			Params: nil})
+
 	beego.GlobalControllerRouter["scholarship/controllers:ScholarshipController"] = append(beego.GlobalControllerRouter["scholarship/controllers:ScholarshipController"],
 		beego.ControllerComments{
 			Method: "Match",
@@ -99,7 +115,7 @@ func init() {
 		beego.ControllerComments{
 			Method: "Sign",
 			Router: `/`,
-			AllowHTTPMethods: []string{"post"},
+			AllowHTTPMethods: []string{"get"},
 			MethodParams: param.Make(),
 			Params: nil})
 
@@ -129,7 +145,7 @@ func init() {
 
 	beego.GlobalControllerRouter["scholarship/controllers:StudentController"] = append(beego.GlobalControllerRouter["scholarship/controllers:StudentController"],
 		beego.ControllerComments{
-			Method: "Get",
+			Method: "GetRelateStudent",
 			Router: `/:name`,
 			AllowHTTPMethods: []string{"get"},
 			MethodParams: param.Make(),
