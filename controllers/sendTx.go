@@ -2,10 +2,8 @@ package controllers
 
 import (
 	"github.com/astaxie/beego"
-	"fmt"
-	"io/ioutil"
-	"net/http"
 	"scholarship/models"
+	middleware "scholarship/middlewares"
 )
 
 type SendTxController struct {
@@ -24,32 +22,23 @@ type SendTxController struct {
 // @Failure 403 :objectId is empty
 // @router / [post]
 func (sendTX * SendTxController) Post(){
+	var result models.ApiResult
 	userFrom := sendTX.GetString("userFrom")
 	password := sendTX.GetString("password")
 	userTo := sendTX.GetString("userTo")
 	money := sendTX.GetString("money")
 
-	//"http://localhost:46600/sendTx?userFrom=&password=&money=&userToAddress"
 
-	url :=   beego.AppConfig.String("BasecoinUrl")+"/sendTx?userFrom="+userFrom+
-				"&password="+password+"&money="+money+"&userToAddress="+userTo
-	fmt.Println(url)
-
-
-	client := &http.Client{}
-	reqest, err := http.NewRequest("GET", url, nil)
-	if err != nil {
-		panic(err)
-	}
-	response, err := client.Do(reqest)
-	body, err := ioutil.ReadAll(response.Body)
+	body, err := middleware.SendTx(userFrom, password, userTo, money)
 	if err != nil{
-		sendTX.Data["json"] = err
+		result.Result = "false"
 	}else if string(body) == "false"{
-		sendTX.Data["json"] = "fail to sendTx"
+		result.Result = "false"
 	}else {
-		sendTX.Data["json"] = "true"
+		result.Result = "true"
 	}
+	result.Data = body
+	sendTX.Data["json"] = result
 	sendTX.ServeJSON()
 }
 
@@ -70,30 +59,15 @@ func (sendTX * SendTxController) Get(){
 	password := sendTX.GetString("password")
 	userTo := sendTX.GetString("userTo")
 	money := sendTX.GetString("money")
-
-	//"http://localhost:46600/sendTx?userFrom=&password=&money=&userToAddress"
-
-	url :=   beego.AppConfig.String("BasecoinUrl")+"/sendTx?userFrom="+userFrom+
-		"&password="+password+"&money="+money+"&userToAddress="+userTo
-	fmt.Println(url)
-
-	client := &http.Client{}
-	reqest, err := http.NewRequest("GET", url, nil)
-	if err != nil {
-		panic(err)
-	}
-	response, err := client.Do(reqest)
-	body, err := ioutil.ReadAll(response.Body)
+	body, err := middleware.SendTx(userFrom, password, userTo, money)
 	if err != nil{
 		result.Result = "false"
-		sendTX.Data["json"] = result
 	}else if string(body) == "false"{
 		result.Result = "false"
-		result.Data = "fail to sendTx"
-		sendTX.Data["json"] = result
 	}else {
 		result.Result = "true"
-		sendTX.Data["json"] = result
 	}
+	result.Data = body
+	sendTX.Data["json"] = result
 	sendTX.ServeJSON()
 }

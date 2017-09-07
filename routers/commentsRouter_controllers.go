@@ -65,9 +65,17 @@ func init() {
 
 	beego.GlobalControllerRouter["scholarship/controllers:ProjectController"] = append(beego.GlobalControllerRouter["scholarship/controllers:ProjectController"],
 		beego.ControllerComments{
-			Method: "Post",
+			Method: "CreateProject",
 			Router: `/`,
-			AllowHTTPMethods: []string{"post"},
+			AllowHTTPMethods: []string{"get"},
+			MethodParams: param.Make(),
+			Params: nil})
+
+	beego.GlobalControllerRouter["scholarship/controllers:RechargeController"] = append(beego.GlobalControllerRouter["scholarship/controllers:RechargeController"],
+		beego.ControllerComments{
+			Method: "Get",
+			Router: `/`,
+			AllowHTTPMethods: []string{"get"},
 			MethodParams: param.Make(),
 			Params: nil})
 
@@ -99,7 +107,7 @@ func init() {
 		beego.ControllerComments{
 			Method: "Sign",
 			Router: `/`,
-			AllowHTTPMethods: []string{"post"},
+			AllowHTTPMethods: []string{"get"},
 			MethodParams: param.Make(),
 			Params: nil})
 
@@ -129,7 +137,7 @@ func init() {
 
 	beego.GlobalControllerRouter["scholarship/controllers:StudentController"] = append(beego.GlobalControllerRouter["scholarship/controllers:StudentController"],
 		beego.ControllerComments{
-			Method: "Get",
+			Method: "GetRelateStudent",
 			Router: `/:name`,
 			AllowHTTPMethods: []string{"get"},
 			MethodParams: param.Make(),
@@ -142,5 +150,18 @@ func init() {
 			AllowHTTPMethods: []string{"get"},
 			MethodParams: param.Make(),
 			Params: nil})
-
+	 beego.GlobalControllerRouter["scholarship/controllers:AccountController"] = append(beego.GlobalControllerRouter["scholarship/controllers:AccountController"],
+                beego.ControllerComments{
+                        Method: "Search",
+                        Router: `/`,
+                        AllowHTTPMethods: []string{"get"},
+                        MethodParams: param.Make(),
+                        Params: nil})	
+	beego.GlobalControllerRouter["scholarship/controllers:AccountBalanceController"] = append(beego.GlobalControllerRouter["scholarship/controllers:AccountBalanceController"],
+                beego.ControllerComments{
+                        Method: "GetBalance",
+                        Router: `/`,
+                        AllowHTTPMethods: []string{"get"},
+                        MethodParams: param.Make(),
+                        Params: nil}) 
 }

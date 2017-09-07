@@ -6,9 +6,8 @@ import (
 	"io/ioutil"
 	"fmt"
 	"scholarship/models"
-	"net/http"
 	"encoding/hex"
-	"net/url"
+	middleware "scholarship/middlewares"
 )
 
 // Operations about object
@@ -21,57 +20,44 @@ type StudentController struct {
 // @Param	name		query 	string	true		"The username for login"
 // @Param	tea_name		query 	string	true		"The tea_username for login"
 // @Param	password		query 	string	true		"The password for student to operator"
-// @Param	sign		query 	string	true		"The sign for login"
-// @Param	body		body 	models.Student	true		"body for student content"
+// @Param	signature		query 	string	true		"The sign for login"
+// @Param	message		query 	string	true		"the detail of student info"
 // @Success 200 {string} models.Student.Address
 // @Failure 403 body is empty
 // @router / [post]
 func (s *StudentController) Create() {
 
+	//return two parameter  student address & file address of student info
 	// 先verify  后 创建address
 	//http://192.168.1.64:46600/
 	// "http://localhost:46600/verify?name=&signature=&message="
 	var result models.ApiResult
 	name := s.GetString("name")
 	tea_name := s.GetString("tea_name")
-	sign := s.GetString("sign")
+	signature := s.GetString("sign")
 	password := s.GetString("password")
+	message := s.GetString("message")
+	messageByte, err := hex.DecodeString(message)
 
-	v := &url.Values{}
-	v.Set("name",tea_name)
-	v.Set("signature",sign)
-	v.Set("message",string(s.Ctx.Input.RequestBody))
-	url := beego.AppConfig.String("BasecoinUrl")+ "/verify?" + v.Encode()
-	fmt.Println(url)
-	client := &http.Client{}
-	reqest, err := http.NewRequest("GET", url, nil)
-	if err != nil {
-		panic(err)
-	}
-	//处理返回结果
-	response, err := client.Do(reqest)
-	body, err := ioutil.ReadAll(response.Body)
+	body, err := middleware.Verify(tea_name, signature, message)
 	fmt.Println(string(body))
+
 	if err !=nil{
 		result.Result = "false"
-		result.Data = ""
-		s.Data["json"] = result
+		result.Data = "verify false"
 	}else{
-		if(string(body)!= "false"){
-			// 调用 生成address 的函数，生成address
-			//info, err := utilPro.NewKeys(s.GetString("username"),s.GetString("password"))
-			//if err !=nil {
-			//	fmt.Println(err)
-			//}
-			url2 := beego.AppConfig.String("BasecoinUrl")+"/register?name="+name +"&password="+password
-			fmt.Println(url2)
-			client := &http.Client{}
-			reqest, err := http.NewRequest("GET", url2, nil)
-			if err != nil {
-				panic(err)
-			}
-			response, err := client.Do(reqest)
-			body, err := ioutil.ReadAll(response.Body)
+		if string(body)!= "false" {
+			body, err := middleware.Register(name, password)
+
+			//add new account into online system by do a transaction with it
+			originalUser := beego.AppConfig.String("originalUser")
+			originalUserPassword := beego.AppConfig.String("originalUserPassword")
+			middleware.SendTx(originalUser, originalUserPassword, string(body), "1mycoin")
+
+			//get money back
+			originalUserAddress := beego.AppConfig.String("originalUserAddress")
+			middleware.SendTx(name, password, originalUserAddress, "1mycoin")
+
 			if err !=nil{
 				fmt.Println(err)
 			}
@@ -79,7 +65,7 @@ func (s *StudentController) Create() {
 			address := hex.EncodeToString(body)
 
 			// 调用 ipfs 函数，
-			err = ioutil.WriteFile("tmp/output.json",s.Ctx.Input.RequestBody,0666)
+			err = ioutil.WriteFile("tmp/output.json", messageByte, 0666)
 			if err != nil{
 				fmt.Println(err)
 			}
@@ -90,17 +76,20 @@ func (s *StudentController) Create() {
 			err = m.InsertIntoMT(beego.AppConfig.String("MTUrl"),address,hash)
 			if err != nil {
 				result.Result = "false"
-				result.Data = ""
-				s.Data["json"] = result
 			}else {
+				var createStudent models.CreateProjectResult
+				createStudent.DocAddress = hash
+				createStudent.ProAddress = address
 				result.Result = "true"
-				result.Data = address
-				s.Data["json"] = result
+				result.Data = createStudent
 			}
 		}else{
-			s.Data["json"] = "验证失败"
+			result.Result = "false"
+			result.Data = ""
+
 		}
 	}
+	s.Data["json"] = result
 	s.ServeJSON()
 }
 

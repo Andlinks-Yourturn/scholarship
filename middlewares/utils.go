@@ -5,6 +5,8 @@ import (
 	"os/exec"
 	"fmt"
 	"strings"
+	"io/ioutil"
+	"net/http"
 )
 
 // 上传ipfs   返回ipfs 地址
@@ -39,4 +41,24 @@ func IpfsDownload(hash string,output string)(error)  {
 		return err
 	}
 	return nil
+}
+
+func SendRequest(url string) ([]byte, error){
+	fmt.Println(url)
+	client := &http.Client{}
+	reqest, err := http.NewRequest("GET", url, nil)
+	if err != nil {
+		fmt.Println(err)
+		//		panic(err)
+	}
+	//处理返回结果
+	response, err := client.Do(reqest)
+	body, err := ioutil.ReadAll(response.Body)
+	if err != nil{
+		return []byte("error"), err
+	}else if string(body) == "false"{
+		return []byte("false"), nil
+	}else{
+		return body, nil
+	}
 }

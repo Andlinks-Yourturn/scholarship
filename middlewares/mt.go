@@ -23,8 +23,8 @@ func getlength(length int) string{
 		return "0x01"
 	}else {
 
-		reault:= fmt.Sprintf("%02x", length/2)
-		return reault
+		result := fmt.Sprintf("%02x", length/2)
+		return result
 	}
 }
 
@@ -91,9 +91,10 @@ func InsertIntoMT(url string,inputKey string, inputValue string) error{
 func getFileRequest(projectKey string, studentKey string) string {
 	//编码
 	//string to HEX
-	//stringValue := stringToHex(inputValue)
+	//stringValue := stringToHex(inputValue)  tx=0x020102null0117QmPiGJvbS6Dq8BzV5wP2vQBrzHZDZsyARidEFkbv2noF9u
 	partM := getlength(len(projectKey))
 	partL :=getlength(len(partM))
+
 
 	fmt.Println("lenK: ",partL," ",partM)
 
@@ -172,7 +173,6 @@ func searchValue(url string, inputKey string) string{
 	}else{
 		return "error"
 	}
-
 }
 //func main() {
 //

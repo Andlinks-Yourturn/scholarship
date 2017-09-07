@@ -1,9 +1,10 @@
 package controllers
 
 import (
-	m "scholarship/middlewares"
-
+	middleware "scholarship/middlewares"
+	"scholarship/models"
 	"github.com/astaxie/beego"
+	"fmt"
 )
 
 // Operations about object
@@ -19,16 +20,23 @@ type ScholarshipController struct {
 // @Failure 403 body is empty
 // @router / [get]
 func (s *ScholarshipController) Match() {
-
+	var result models.ApiResult
 	sAddr := s.GetString("sAddr")
 	pAddr := s.GetString("pAddr")
-	str := m.Comparefiles(beego.AppConfig.String("MTUrl"),pAddr,sAddr)
+	fmt.Println("sAddr "+sAddr+"  pAddr"+pAddr)
+	str := middleware.Comparefiles(beego.AppConfig.String("MTUrl"),pAddr,sAddr)
 	if str == "failure" {
-		s.Data["json"] = "failure"
+		result.Result = "false"
+		result.Data = ""
+		s.Data["json"] = result
 	}else if str == "success"{
+		result.Result = "true"
+		result.Data = ""
 		s.Data["json"] = "success"
 	}else {
-		s.Data["json"] = "Matched error"
+		result.Result = "false"
+		result.Data = "fail to match"
+		s.Data["json"] = result
 	}
 	s.ServeJSON()
 }
